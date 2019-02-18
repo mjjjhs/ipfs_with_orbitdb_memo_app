@@ -1,0 +1,5 @@
+node_modules/
+.git/
+pakage_lock.json
+
+
