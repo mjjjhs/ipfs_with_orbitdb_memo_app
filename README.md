@@ -25,3 +25,6 @@ npm run serve
     }
 ]
 ```
+![screen2](https://user-images.githubusercontent.com/4207593/53072914-d67da300-3529-11e9-9cf3-08767ddee3d6.png)
+
+![screen1](https://user-images.githubusercontent.com/4207593/53072913-d5e50c80-3529-11e9-9963-19e94081b867.png)
