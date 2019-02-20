@@ -19,8 +19,8 @@
       />
     </form>
     <div>
-      <b-button variant="outline-primary" v-if="file && !isLoading" v-on:click="clickUpload">Upload</b-button>
-      <div class="d-flex justify-content-center mb-3" v-if="isLoading">
+      <b-button variant="outline-primary" v-if="file && !isImgUploadLoading" v-on:click="clickUpload">Upload</b-button>
+      <div class="d-flex justify-content-center mb-3" v-if="isImgUploadLoading">
         <b-spinner label="Loading..." />
       </div>
     </div>
@@ -44,21 +44,34 @@
     <h4 v-if="imgData && !file">분산 파일시스템 업로드 이미지</h4>
     <p v-if="imgData && !file">{{imgData.hash}}</p>
     <img class="resultImg" :src="imgData.src" v-if="imgData && !file">
+    <h4>해시 주소로 이미지 데이터 가져오기</h4>
+    <b-form-input class="hash_input" id="hash_input" v-model="hash" type="text" placeholder="Enter hash value" />
+    <b-button variant="outline-primary" v-if="hash && !isGettingData" v-on:click="clickGetData">Get Data</b-button>
+    <div class="d-flex justify-content-center mb-3" v-if="isGettingData">
+      <b-spinner label="Loading..." />
+    </div>
+    <h4 v-if="hashToData">분산 파일시스템 업로드 이미지</h4>
+    <img class="resultImg" :src="hashToData.src" v-if="hashToData">
   </div>
+
 </template>
 
 <script>
 import axios from 'axios';
 
 export default {
+  //QmemUNfbhukPNNoqhxbnYNWTTQnRKe8n4UENX72Cy11tRM
   name: 'AddGetFile',
   props: {
     msg: String,
   },
   data() {
     return {
+      hash: null,
+      hashToData: null,
+      isGettingData: false,
       file: null,
-      isLoading: false,
+      isImgUploadLoading: false,
       imgData: null
     }
   },
@@ -71,13 +84,13 @@ export default {
         }
       };
       try {
-        this.isLoading = true;
+        this.isImgUploadLoading = true;
         const rv = await axios.post(
           '/api/ipfs/addFile',
           formData,
           headers
         );
-        this.isLoading = false;
+        this.isImgUploadLoading = false;
         console.log('rv::', rv.data);
         if(rv.data.result !== 200){
           switch(rv.data.message) {
@@ -97,6 +110,25 @@ export default {
         }
       } catch (e) {
         console.log('err::', e );
+      }
+    },
+    async clickGetData(e) {
+      const cid = document.getElementById('hash_input').value;
+      this.isGettingData = true;
+      const rv = await axios.get(`/api/ipfs/getFile/${cid}`);
+      this.isGettingData = false;
+      console.log('rv::', rv.data);
+      if(rv.data.result !== 200){
+        switch(rv.data.message) {
+          case 'IPFS_GET_ERROR':
+            this.showModal('modal3');
+            break;
+        }
+      }else {
+        this.hashToData = {
+          src: `data:image/png;base64, ${rv.data.data.src}`,
+          hash: rv.data.data.hash
+        }
       }
     },
     showModal (modalType) {
@@ -136,9 +168,13 @@ export default {
   a {
     color: #42b983;
   }
-  .custom-file {
+  .custom-file, .hash_input {
     min-width:310px;
     width:70%;
+    margin-top: 20px;
+  }
+  .hash_input {
+    margin: 0 auto;
     margin-top: 20px;
   }
   .btn, .d-flex {
