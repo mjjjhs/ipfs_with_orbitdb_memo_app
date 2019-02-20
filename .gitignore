@@ -2,10 +2,7 @@ node_modules/
 .git/
 pakage_lock.json
 .env
-<<<<<<< HEAD
 .git2
 .gitlab
 .github
-=======
->>>>>>> 1caa2f13fa3480f73395ba38f29599b582702ae1
 
