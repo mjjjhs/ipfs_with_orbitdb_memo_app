@@ -1,5 +1,8 @@
 node_modules/
 .git/
 pakage_lock.json
-
+.env
+.git2
+.gitlab
+.github
 
